@@ -1,6 +1,8 @@
 var addonMap = {
     "maxScore": "关",
     "g2nStar": "星",
+    "g3level": "关",
+    "g4maxScore":"分"
 };
         
 cc.Class({
@@ -202,6 +204,11 @@ cc.Class({
                         // 提交分数到微信云服务器
                         console.log("更新用户的关卡数，对当前用户的微信托管数据，进行写数据操作。");
                         this.refreshUserInfo(data.g3level,"g3level");
+                        break;
+                    case 6:
+                        // 提交分数到微信云服务器
+                        console.log("更新用户的最大分数，对当前用户的微信托管数据，进行写数据操作。");
+                        this.refreshUserInfo(data.g4maxScore,"g4maxScore");
                         break;
                     case 1:
                         // 获取用户某一个key的排行榜信息
