@@ -4,6 +4,7 @@ var addonMap = {
     "g3level": "关",
     "g4maxScore": "分",
     "g5level": "关",
+    "g6level":"关"
 };
         
 cc.Class({
@@ -55,6 +56,7 @@ cc.Class({
     },
     // 根据我的信息获取我的排名
     getMyRank(key) {   
+        this.itemMy.active = false;
         if (!this.userInfo.nickname || this.myFriendsData.length <= 0) return;
         
         console.log("getMyRank--begin")
@@ -77,7 +79,8 @@ cc.Class({
                 this.userInfo.avatarUrl,
                 this.userInfo.nickname,
                 this.userInfo.score,
-                addonMap[key]
+                addonMap[key],
+                this.getChenghao(key,this.userInfo.score)
             );
         }
     },
@@ -156,7 +159,8 @@ cc.Class({
                 obj.avatarUrl,
                 obj.nickname,
                 this.getScore(obj.KVDataList, key),
-                addonMap[key]
+                addonMap[key],
+                this.getChenghao(key,this.getScore(obj.KVDataList, key))
             );
         }
     },
@@ -170,6 +174,34 @@ cc.Class({
     },
     isWechat() { 
         return cc.sys.platform === cc.sys.WECHAT_GAME || cc.sys.platform === cc.sys.WECHAT_GAME_SUB;
+    },
+    getChenghao(key, score) { 
+        if (key !== "g6level") return "";
+        var guans = 30,
+            arr = [
+                "学童",
+                "童生",
+                "秀才",
+                "举人",
+                "贡士",
+
+                "进士",
+                "翰林",
+                "侍郎",
+                "尚书",
+                "大学士",
+
+                "御史",
+                "丞相",
+                "太子少师",
+                "太子太师"
+            ];
+        score = parseInt(score);
+        score = isNaN(score) ? 1 : score;
+        score = Math.max(1, score);
+        score = Math.min(guans * arr.length, score);
+        var index = Math.floor((score - 1) / guans);
+        return arr[index];
     },
 
 
@@ -215,6 +247,11 @@ cc.Class({
                         // 提交分数到微信云服务器
                         console.log("更新用户的关卡数，对当前用户的微信托管数据，进行写数据操作。");
                         this.refreshUserInfo(data.g5level,"g5level");
+                        break;
+                    case 8:
+                        // 提交分数到微信云服务器
+                        console.log("更新用户的关卡数，对当前用户的微信托管数据，进行写数据操作。");
+                        this.refreshUserInfo(data.g6level, "g6level");
                         break;
                     case 1:
                         // 获取用户某一个key的排行榜信息

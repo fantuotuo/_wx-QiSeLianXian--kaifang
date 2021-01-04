@@ -47,6 +47,16 @@ cc.Class({
                 this.node.getChildByName("score").getComponent("cc.Label").string = v + this.addon;
             }
         },
+        uChenghao: {
+            get() { 
+                return this._uChengao;
+            },
+            set(v) { 
+                this._uChengao = v;
+                // todo
+                this.node.getChildByName("chenghao").getComponent("cc.Label").string = v;
+            }
+        },
 
         addon: cc.String,
         
@@ -55,13 +65,14 @@ cc.Class({
 
     
 
-    init(rank, avatarUrl, name, score, addon) {
+    init(rank, avatarUrl, name, score, addon, chenghao) {
         this.addon = addon ? addon : "";
 
         this.uRank = rank;
         this.uAvatar = avatarUrl;
         this.uName = name;
         this.uScore = score;
+        this.uChenghao = chenghao;
     },
 
     // LIFE-CYCLE CALLBACKS:
