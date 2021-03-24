@@ -8,7 +8,8 @@ var addonMap = {
     "g7maxScore": "分",
     "g8maxScore": "个字",
     "g9maxScore": "分",
-    "g10level":"关",
+    "g10level": "关",
+    "g11stars":"星"
 };
         
 cc.Class({
@@ -276,6 +277,11 @@ cc.Class({
                         // 提交分数到微信云服务器
                         console.log("更新用户的关卡数，对当前用户的微信托管数据，进行写数据操作。");
                         this.refreshUserInfo(data.g10level, "g10level");
+                        break;
+                    case 13:
+                        // 提交分数到微信云服务器
+                        console.log("更新用户的stars，对当前用户的微信托管数据，进行写数据操作。");
+                        this.refreshUserInfo(data.g11stars, "g11stars");
                         break;
                     case 1:
                         // 获取用户某一个key的排行榜信息
