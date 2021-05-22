@@ -11,7 +11,7 @@ var addonMap = {
     "g10level": "关",
     "g11stars":"星"
 };
-        
+
 cc.Class({
     extends: cc.Component,
 

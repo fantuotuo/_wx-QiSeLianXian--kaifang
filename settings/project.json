@@ -12,7 +12,6 @@
     "AudioSource",
     "Action",
     "Animation",
-    "Button",
     "Collider",
     "Dynamic Atlas",
     "DragonBones",
@@ -69,5 +68,5 @@
       "enable": false
     }
   },
-  "last-module-event-record-time": 1616561023261
+  "last-module-event-record-time": 1621482658388
 }
