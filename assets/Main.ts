@@ -18,7 +18,8 @@ var addonMap = {
     "g8maxScore": "个字",
     "g9maxScore": "分",
     "g10level": "关",
-    "g11stars":"星"
+    "g11stars": "星",
+    "g13stars":"星"
 };
 
 
@@ -59,7 +60,7 @@ interface GiftObj {
 
 @ccclass
 export default class Main extends cc.Component{
-
+    private act: boolean = true;
 
     private selfOpenid: string = "";                // 自身的openid
     private friendsDataList: UserGameData[] = [];
@@ -73,6 +74,7 @@ export default class Main extends cc.Component{
         return this._rankType;
     }
     set rankType(v) {
+        if (!this.act) return;
         var change = v !== this._rankType;
         this._rankType = v;
         if (!change) return;
@@ -83,7 +85,8 @@ export default class Main extends cc.Component{
         if (v === 0) {
             if (this.selfOpenid) {
                 // 不是onLoad里面的，是后面切换的，需要重新刷新
-                this.initFriendsData();
+                // this.initFriendsData();
+                this.drawFriendRank(this.rankKey);
             } else {
                 this.drawFriendRank(this.rankKey);
             }
@@ -96,6 +99,7 @@ export default class Main extends cc.Component{
         return this._rankKey;
     }
     set rankKey(v) {
+        if (!this.act) return;
         var change = v !== this._rankKey;
         this._rankKey = v;
         if (!change) return;
@@ -103,10 +107,12 @@ export default class Main extends cc.Component{
         this.toggleArrKey.forEach((toggle, i) => {
             toggle.act = v === toggle.key;
         });
+        this.log(v, 'rankKey changed');
         if (this.rankType === 0) {
             if (this.selfOpenid) {
                 // 不是onLoad里面的，是后面切换的，需要重新刷新
-                this.initFriendsData();
+                // this.initFriendsData();
+                this.drawFriendRank(this.rankKey);
             } else {
                 // 此时在onLoad里面
                 this.drawFriendRank(this.rankKey);
@@ -159,6 +165,7 @@ export default class Main extends cc.Component{
             "g9maxScore",
             "g10level",
             "g11stars",
+            "g13stars"
         ];
         var rankKey = this.rankKey;
         wx.getFriendCloudStorage({
@@ -273,6 +280,7 @@ export default class Main extends cc.Component{
         if (this.isWechat()) {
             wx.onMessage(data => {
                 this.log("接收主域发来的消息数据：", data);
+                if (data.fromEngine && data.event === "mainLoop") return this.act = data.value;
                 switch (data.messageType) {
                     // #region 作废消息传递
                     // case 3:
