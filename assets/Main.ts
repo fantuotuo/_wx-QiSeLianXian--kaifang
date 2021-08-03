@@ -68,8 +68,14 @@ export default class Main extends cc.Component{
         key: string,
         value: WorldRankData[]
     }[] = [];
+    private worldDataListWeek: {
+        key: string,
+        value: WorldRankData[]
+    }[] = [];
+
+
     private giftStorageKey: string = new Date().toDateString();
-    _rankType: number = -1;
+    _rankType: number = -1;     // 0好友排行 1世界排行 2周排行
     get rankType() {
         return this._rankType;
     }
@@ -79,6 +85,7 @@ export default class Main extends cc.Component{
         this._rankType = v;
         if (!change) return;
         // 
+        // 更新toggle组件激活状态
         this.toggleArr.forEach((toggle, i) => {
             toggle.act = v === i;
         });
@@ -90,8 +97,10 @@ export default class Main extends cc.Component{
             } else {
                 this.drawFriendRank(this.rankKey);
             }
-        } else {
+        } else if (this.rankType === 1) {
             this.drawWorldRankList();
+        } else {
+            this.drawWorldRankList(true);
         }
     }
     _rankKey: string = "maxScore---";
@@ -104,6 +113,7 @@ export default class Main extends cc.Component{
         this._rankKey = v;
         if (!change) return;
         // 
+        // 更新toggle组件激活状态
         this.toggleArrKey.forEach((toggle, i) => {
             toggle.act = v === toggle.key;
         });
@@ -117,8 +127,10 @@ export default class Main extends cc.Component{
                 // 此时在onLoad里面
                 this.drawFriendRank(this.rankKey);
             }
-        } else {
+        } else if (this.rankType === 1) {
             this.drawWorldRankList();
+        } else {
+            this.drawWorldRankList(true);
         }
     }
 
@@ -184,7 +196,9 @@ export default class Main extends cc.Component{
      * @param rankKey key键值
     */
     drawFriendRank(rankKey: string) {
-        this.containerUserBar.removeAllChildren();
+        var children = this.containerUserBar.children.slice();
+        children.forEach(c => c.destroy());
+        // this.containerUserBar.removeAllChildren();
         
         this.sortArray(this.friendsDataList, rankKey);
         
@@ -224,12 +238,15 @@ export default class Main extends cc.Component{
             });
         }
     }
-    drawWorldRankList() {
+    drawWorldRankList(week = false) {
         var rankKey = this.rankKey;
-        this.containerUserBar.removeAllChildren();
+        var children = this.containerUserBar.children.slice();
+        children.forEach(c => c.destroy());
+        // this.containerUserBar.removeAllChildren();
 
         // 显示LIMIT个
         var worldRnkObj = this.worldDataList.find(o => o.key === rankKey);
+        if(week) worldRnkObj = this.worldDataListWeek.find(o => o.key === rankKey);
         if (!worldRnkObj) return;
         var worldDataList = worldRnkObj.value.slice(0, LIMIT);
         for (var i = 0; i < worldDataList.length; i++){
@@ -344,9 +361,14 @@ export default class Main extends cc.Component{
                         this.initFriendsData();
                         break;
                     case 1:
-                        // 世界
+                        // 世界排行榜信息
                         this.worldDataList = data.rankdata as { key: string, value: WorldRankData[] }[];
-                        this.rankType === 1 && this.drawWorldRankList();
+                        this.worldDataListWeek = data.rankdataWeek as { key: string, value: WorldRankData[] }[];
+                        if (this.rankType === 1) {
+                            this.drawWorldRankList();
+                        } else {
+                            this.drawWorldRankList(true);
+                        }
                         break;
                     default:
                         break;
