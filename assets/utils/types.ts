@@ -1,3 +1,4 @@
+// 世界排行榜数据对象
 export type WorldRankData = {
   score: number;
   _id: string;
@@ -6,6 +7,7 @@ export type WorldRankData = {
   avatarUrl: string;
   nickName: string;
 };
+// 好友托管数据
 export type UserGameData = {
   avatarUrl: string;
   nickname: string;
@@ -15,12 +17,7 @@ export type UserGameData = {
     value: string;
   }[];
 };
-export type UserInfo = {
-  avatarUrl: string;
-  nickName: string;
-  openId: string;
-  privince: string;
-};
+// 好友赠送数据（来自好友托管数据）
 export type GiftObj = {
   sendCount: number;
   receiveRecords: {

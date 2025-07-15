@@ -131,16 +131,15 @@ export default class Main extends cc.Component {
     // this.containerUserBar.removeAllChildren();
 
     sortFriendGameData(this.friendsDataList, this.rankKey);
-
     // 显示LIMIT_RANK个
-    var friendsDataList = this.friendsDataList.slice(0, LIMIT_RANK);
-    for (var i = 0; i < friendsDataList.length; i++) {
-      var obj = friendsDataList[i];
+    const friendsDataList = this.friendsDataList.slice(0, LIMIT_RANK);
+    for (let i = 0; i < friendsDataList.length; i++) {
+      const obj = friendsDataList[i];
       if (isNaN(parseInt(getFriendScoreString(obj.KVDataList, this.rankKey))))
         continue;
 
-      var item = cc.instantiate(this.prefabUserBar),
-        comp = item.getComponent(UserBar);
+      const item = cc.instantiate(this.prefabUserBar);
+      const comp = item.getComponent(UserBar);
       item.parent = this.containerUserBar;
 
       comp.init(
@@ -151,42 +150,48 @@ export default class Main extends cc.Component {
         obj.openid
       );
       // 更新zanBtn显示
-      var openid_same = !this.selfOpenid || obj.openid === this.selfOpenid;
+      const openid_same = !this.selfOpenid || obj.openid === this.selfOpenid;
       comp.canGift =
         !openid_same && checkCanSendGift(obj.KVDataList, this.selfOpenid);
     }
 
     // 显示自己的信息
-    const self = this.friendsDataList.find(
+    const selfObj = this.friendsDataList.find(
       (item) => item.openid === this.selfOpenid
     );
-    if (self) {
-      this.labelMyName.string = `${self.nickname}`;
+    if (selfObj) {
+      this.labelMyName.string = `${selfObj.nickname}`;
       this.labelMyScore.string = `${getFriendScoreString(
-        self.KVDataList,
+        selfObj.KVDataList,
         this.rankKey
       )}`;
-      loadAvatar(self.avatarUrl, this.spMyAvatar);
+      loadAvatar(selfObj.avatarUrl, this.spMyAvatar);
     }
   }
+  /**
+   * 刷新世界排行榜
+   * @param week 是否是周排行榜
+   */
   drawWorldRankList(week = false) {
-    var rankKey = this.rankKey;
-    var children = this.containerUserBar.children.slice();
+    if (!this.rankKey) return;
+    const rankKey = this.rankKey;
+    const children = this.containerUserBar.children.slice();
     children.forEach((c) => c.destroy());
     // this.containerUserBar.removeAllChildren();
 
     // 显示LIMIT_RANK个
-    var worldRnkObj = this.worldDataList.find((o) => o.key === rankKey);
+    let worldRnkObj = this.worldDataList.find((o) => o.key === rankKey);
     if (week)
       worldRnkObj = this.worldDataListWeek.find((o) => o.key === rankKey);
     if (!worldRnkObj) return;
-    var worldDataList = worldRnkObj.value.slice(0, LIMIT_RANK);
-    for (var i = 0; i < worldDataList.length; i++) {
-      var item = cc.instantiate(this.prefabUserBar);
-      item.parent = this.containerUserBar;
 
-      var obj = worldDataList[i],
-        comp = item.getComponent(UserBar);
+    const worldDataList = worldRnkObj.value.slice(0, LIMIT_RANK);
+    for (let i = 0; i < worldDataList.length; i++) {
+      const item = cc.instantiate(this.prefabUserBar);
+      item.parent = this.containerUserBar;
+      const comp = item.getComponent(UserBar);
+
+      const obj = worldDataList[i];
       const score = obj[rankKey as keyof WorldRankData];
       const scoreAddon = AddonMap[rankKey as keyof typeof AddonMap];
       comp.init(
@@ -199,16 +204,16 @@ export default class Main extends cc.Component {
     }
 
     // 显示自己的信息
-    const self = this.friendsDataList.find(
+    const selfObj = this.friendsDataList.find(
       (item) => item.openid === this.selfOpenid
     );
-    if (self) {
-      this.labelMyName.string = `${self.nickname}`;
+    if (selfObj) {
+      this.labelMyName.string = `${selfObj.nickname}`;
       this.labelMyScore.string = `${getFriendScoreString(
-        self.KVDataList,
+        selfObj.KVDataList,
         rankKey || ""
       )}`;
-      loadAvatar(self.avatarUrl, this.spMyAvatar);
+      loadAvatar(selfObj.avatarUrl, this.spMyAvatar);
     }
   }
 
@@ -220,6 +225,7 @@ export default class Main extends cc.Component {
     this.modal.hide();
     if (!isWechat()) return;
 
+    // 此时会刷新显示
     this.rankType = RankType.FRIEND;
     this.rankKey = "maxScore";
     this.scrollView.node.on("scrolling", this.onScrolling, this);
@@ -229,8 +235,10 @@ export default class Main extends cc.Component {
 
     wx.onMessage((data: any) => {
       log("接收主域发来的消息数据：", data);
+      // 主域发来消息，是否需要显示子域
       if (data.fromEngine && data.event === "mainLoop")
         return (this.act = data.value);
+
       switch (data.messageType) {
         case MessageType.SEND_OPENID:
           this.selfOpenid = data.selfOpenid;

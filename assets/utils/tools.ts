@@ -33,11 +33,9 @@ export function getFriendScoreString(
   rankKey: string
 ) {
   const addon = AddonMap[rankKey as keyof typeof AddonMap] || "";
-
-  for (var i = 0; i < KVDataList.length; i++) {
-    if (KVDataList[i].key === rankKey) {
-      return KVDataList[i].value + addon;
-    }
+  const kvData = KVDataList.find((item) => item.key === rankKey);
+  if (kvData) {
+    return kvData.value + addon;
   }
   return "-" + addon;
 }
