@@ -259,8 +259,18 @@ export default class Main extends cc.Component {
     wx.onMessage((data: any) => {
       log("接收主域发来的消息数据：", data);
       // 主域发来消息，是否需要显示子域
-      if (data.fromEngine && data.event === "mainLoop")
-        return (this.act = data.value);
+      if (data.fromEngine && data.event === "mainLoop") {
+        this.act = data.value;
+        // 主动拉数据
+        if (this.act && this.rankType !== RankType.FRIEND) {
+          wx.postMessage({
+            messageType: MessageType.QUERY_RANK_DATA_SINGLE,
+            rankKey: this.rankKey,
+            isWeek: this.rankType === RankType.WEEK,
+          });
+        }
+        return;
+      }
 
       switch (data.messageType) {
         case MessageType.SEND_OPENID:
