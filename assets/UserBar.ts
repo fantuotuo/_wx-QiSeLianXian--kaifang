@@ -64,6 +64,7 @@ export default class NewClass extends cc.Component {
         console.log("赠送体力成功！", res);
       },
       fail: (res: any) => {
+        console.log("赠送体力失败！", res);
         this.showModal("一天只能给同一个人送一次体力哦！");
       },
     });
