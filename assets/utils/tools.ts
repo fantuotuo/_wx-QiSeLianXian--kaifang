@@ -64,7 +64,7 @@ export function checkCanSendGift(
   const find = objGift.receiveRecords.find((record) => {
     return record.fromOpenid === selfOpenid;
   });
-  return Boolean(find);
+  return !Boolean(find);
 }
 
 /**
@@ -80,5 +80,14 @@ export function isWechat() {
   return (
     cc.sys.platform === cc.sys.WECHAT_GAME ||
     cc.sys.platform === cc.sys.WECHAT_GAME_SUB
+  );
+}
+
+export function loadAvatar(avatarUrl: string, avatar: cc.Sprite) {
+  cc.loader.load(
+    { url: avatarUrl, type: "jpg" },
+    function (err: any, tex: cc.Texture2D) {
+      avatar.spriteFrame = new cc.SpriteFrame(tex);
+    }
   );
 }

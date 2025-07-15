@@ -1,3 +1,4 @@
+import { loadAvatar } from "./utils/tools";
 import Modal from "./Modal";
 
 const { ccclass, property } = cc._decorator;
@@ -44,14 +45,7 @@ export default class NewClass extends cc.Component {
     this.labelRank.string = `${rank}`;
     this.labelName.string = `${name ? name : "未知昵称"}`;
     this.labelScore.string = `${score}`;
-
-    const avatar = this.avatar;
-    cc.loader.load(
-      { url: avatarUrl, type: "jpg" },
-      function (err: any, texture: cc.Texture2D) {
-        avatar.spriteFrame = new cc.SpriteFrame(texture);
-      }
-    );
+    loadAvatar(avatarUrl, this.avatar);
 
     this.canGift = false;
   }
