@@ -35,6 +35,8 @@ export enum RankType {
 export enum MessageType {
   SEND_OPENID = 0,
   SEND_RANK_DATA = 1,
+  QUERY_RANK_DATA_SINGLE = 2,
+  SEND_RANK_DATA_SINGLE = 3,
 }
 
 export const LIMIT_RANK = 40; // 最多展示多少个

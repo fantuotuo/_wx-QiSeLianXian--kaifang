@@ -38,6 +38,12 @@ export default class Main extends cc.Component {
     key: string;
     value: WorldRankData[];
   }[] = [];
+  private rankDataSingle: {
+    [key: string]: WorldRankData[];
+  } = {};
+  private rankDataSingleWeek: {
+    [key: string]: WorldRankData[];
+  } = {};
 
   _rankType?: RankType; // 0好友排行 1世界排行 2周排行
   get rankType() {
@@ -53,10 +59,17 @@ export default class Main extends cc.Component {
     this.toggleArr.forEach((toggle, i) => (toggle.act = v === i));
     if (v === RankType.FRIEND) {
       this.drawFriendRank();
-    } else if (this.rankType === RankType.WORLD) {
-      this.drawWorldRankList();
     } else {
-      this.drawWorldRankList(true);
+      if (this.rankType === RankType.WORLD) {
+        this.drawWorldRankList();
+      } else {
+        this.drawWorldRankList(true);
+      }
+      wx.postMessage({
+        messageType: MessageType.QUERY_RANK_DATA_SINGLE,
+        rankKey: this.rankKey,
+        isWeek: this.rankType === RankType.WEEK,
+      });
     }
   }
   _rankKey?: keyof typeof AddonMap;
@@ -74,10 +87,17 @@ export default class Main extends cc.Component {
     log(v, "rankKey changed");
     if (this.rankType === RankType.FRIEND) {
       this.drawFriendRank();
-    } else if (this.rankType === RankType.WORLD) {
-      this.drawWorldRankList();
     } else {
-      this.drawWorldRankList(true);
+      if (this.rankType === RankType.WORLD) {
+        this.drawWorldRankList();
+      } else {
+        this.drawWorldRankList(true);
+      }
+      wx.postMessage({
+        messageType: MessageType.QUERY_RANK_DATA_SINGLE,
+        rankKey: this.rankKey,
+        isWeek: this.rankType === RankType.WEEK,
+      });
     }
   }
 
@@ -180,12 +200,15 @@ export default class Main extends cc.Component {
     // this.containerUserBar.removeAllChildren();
 
     // 显示LIMIT_RANK个
-    let worldRnkObj = this.worldDataList.find((o) => o.key === rankKey);
-    if (week)
-      worldRnkObj = this.worldDataListWeek.find((o) => o.key === rankKey);
-    if (!worldRnkObj) return;
+    // let worldRnkObj = this.worldDataList.find((o) => o.key === rankKey);
+    // if (week)
+    //   worldRnkObj = this.worldDataListWeek.find((o) => o.key === rankKey);
+    // if (!worldRnkObj) return;
+    let worldRankObj = this.rankDataSingle[rankKey];
+    if (week) worldRankObj = this.rankDataSingleWeek[rankKey];
+    if (!worldRankObj) return;
 
-    const worldDataList = worldRnkObj.value.slice(0, LIMIT_RANK);
+    const worldDataList = worldRankObj.slice(0, LIMIT_RANK);
     for (let i = 0; i < worldDataList.length; i++) {
       const item = cc.instantiate(this.prefabUserBar);
       item.parent = this.containerUserBar;
@@ -251,6 +274,27 @@ export default class Main extends cc.Component {
           if (this.rankType === RankType.WORLD) {
             this.drawWorldRankList();
           } else if (this.rankType === RankType.WEEK) {
+            this.drawWorldRankList(true);
+          }
+          break;
+        case MessageType.SEND_RANK_DATA_SINGLE:
+          if (data.isWeek) {
+            this.rankDataSingleWeek[data.rankKey] = data.rankdata;
+          } else {
+            this.rankDataSingle[data.rankKey] = data.rankdata;
+          }
+          // 只有当前选项匹配才绘制
+          if (
+            this.rankKey === data.rankKey &&
+            this.rankType === RankType.WORLD &&
+            !data.isWeek
+          ) {
+            this.drawWorldRankList();
+          } else if (
+            this.rankKey === data.rankKey &&
+            this.rankType === RankType.WEEK &&
+            data.isWeek
+          ) {
             this.drawWorldRankList(true);
           }
           break;
