@@ -6,7 +6,7 @@ export type WorldRankData = {
   avatarUrl: string;
   nickName: string;
 };
-export type FriendGameData = {
+export type UserGameData = {
   avatarUrl: string;
   nickname: string;
   openid: string;
@@ -35,7 +35,12 @@ export enum RankType {
   WORLD = 1,
   WEEK = 2,
 }
+export enum MessageType {
+  SEND_OPENID = 0,
+  SEND_RANK_DATA = 1,
+}
 
+export const LIMIT_RANK = 40; // 最多展示多少个
 export const AddonMap = {
   maxScore: "关",
   g2nStar: "星",
@@ -50,23 +55,5 @@ export const AddonMap = {
   g11stars: "星",
   g13stars: "星",
 };
-export const RankKeyArr = [
-  "maxScore",
-  "g2nStar",
-  "g3level",
-  "g4maxScore",
-  "g5level",
-  "g6level",
-  "g7maxScore",
-  "g8maxScore",
-  "g9maxScore",
-  "g10level",
-  "g11stars",
-  "g13stars",
-];
+export const RankKeyArr = Object.keys(AddonMap);
 export const GiftStorageKey = new Date().toDateString(); // 每天的key不一样
-export const LIMIT_RANK = 40; // 最多展示多少个
-export enum MessageType {
-  SEND_OPENID = 0,
-  SEND_RANK_DATA = 1,
-}

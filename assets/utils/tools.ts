@@ -1,11 +1,11 @@
-import { AddonMap, FriendGameData, GiftObj, GiftStorageKey } from "./types";
+import { AddonMap, UserGameData, GiftObj, GiftStorageKey } from "./types";
 
 /**
  * 对数组进行排序处理（倒序）
- * @param data FriendGameData数组
+ * @param data UserGameData数组
  * @param rankKey 需要排序的key
  */
-export function sortFriendGameData(data: FriendGameData[], rankKey: string) {
+export function sortFriendGameData(data: UserGameData[], rankKey: string) {
   data.sort((a, b) => {
     const scoreA = getFriendScoreString(a.KVDataList, rankKey),
       scoreB = getFriendScoreString(b.KVDataList, rankKey);
@@ -29,10 +29,10 @@ export function sortFriendGameData(data: FriendGameData[], rankKey: string) {
  * @return score string类型
  */
 export function getFriendScoreString(
-  KVDataList: FriendGameData["KVDataList"],
+  KVDataList: UserGameData["KVDataList"],
   rankKey: string
 ) {
-  const addon = AddonMap[rankKey] || "";
+  const addon = AddonMap[rankKey as keyof typeof AddonMap] || "";
 
   for (var i = 0; i < KVDataList.length; i++) {
     if (KVDataList[i].key === rankKey) {
@@ -43,31 +43,25 @@ export function getFriendScoreString(
 }
 
 /**
- * 获取礼物数据
- * @param KVDataList 某一个用户的KVDataList
- */
-function getGift(KVDataList: FriendGameData["KVDataList"]): GiftObj {
-  const kvData = KVDataList.find((item) => item.key === GiftStorageKey);
-  if (kvData) {
-    return JSON.parse(kvData.value);
-  }
-
-  return {
-    sendCount: 0,
-    receiveRecords: [],
-  };
-}
-/**
  * 判断是否可以继续赠送礼物
  * @param KVDataList 对方用户的KVDataList
  * @param selfOpenid 自己的openid
  */
 export function checkCanSendGift(
-  KVDataList: FriendGameData["KVDataList"],
+  KVDataList: UserGameData["KVDataList"],
   selfOpenid: string
 ) {
-  const obj_gift = getGift(KVDataList);
-  const find = obj_gift.receiveRecords.find((record) => {
+  // 先找到对方的礼物记录
+  const kvData = KVDataList.find((item) => item.key === GiftStorageKey);
+  let objGift: GiftObj = {
+    sendCount: 0,
+    receiveRecords: [],
+  };
+  if (kvData) {
+    objGift = JSON.parse(kvData.value);
+  }
+
+  const find = objGift.receiveRecords.find((record) => {
     return record.fromOpenid === selfOpenid;
   });
   return Boolean(find);
@@ -82,6 +76,9 @@ export function log(...params: any[]) {
   console.log(...params);
 }
 
-export function isWechat() { 
-  return cc.sys.platform === cc.sys.WECHAT_GAME || cc.sys.platform === cc.sys.WECHAT_GAME_SUB;
+export function isWechat() {
+  return (
+    cc.sys.platform === cc.sys.WECHAT_GAME ||
+    cc.sys.platform === cc.sys.WECHAT_GAME_SUB
+  );
 }
