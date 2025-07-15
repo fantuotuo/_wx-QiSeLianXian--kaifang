@@ -1,17 +1,1 @@
-
-
-
-export const RankData = {
-
-
-
-
-
-
-
-
-
-
-
-
-}
+export const RankData = {};
